@@ -37,7 +37,7 @@ def telegram_bot_sendtext(message):
    requests.get(send_text)
 
 def get_previous_commit():
-  url = f'{api_url}/api/v4/projects/{project_id}/pipelines?ref={branch}&scope=finished'
+  url = f'{api_url}/projects/{project_id}/pipelines?ref={branch}&scope=finished'
   response = requests.get(url, headers={'PRIVATE-TOKEN': private_token })
   response_json = response.json()
   return response_json[0]['sha']
