@@ -3,6 +3,9 @@
 import requests
 import subprocess
 import os
+import sys
+
+chat_id = os.getenv('TELEGRAM_CHAT_ID', '')
 
 bot_token = os.getenv('TELEGRAM_BOT_TOKEN', '')
 chat_id = os.getenv('TELEGRAM_CHAT_ID', '')
@@ -17,6 +20,13 @@ pipeline_id = os.getenv('CI_PIPELINE_ID', '0')
 job_status = os.getenv('CI_JOB_STATUS', 'failed')
 job_stage = os.getenv('CI_JOB_STAGE', 'test')
 api_url = os.getenv('CI_API_V4_URL')
+
+if sys.argv[1]: 
+  print(sys.argv[1])
+  id = sys.argv[1].split("=")
+  if id[1]:
+    chat_id = id[1]
+
 
 def validate():
   if private_token == '':
