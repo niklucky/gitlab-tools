@@ -17,14 +17,15 @@ project_name = os.getenv('CI_PROJECT_NAME', 'unknown')
 project_group = os.getenv('CI_PROJECT_NAMESPACE', 'unknown')
 project_url = os.getenv('CI_PROJECT_URL', '/')
 pipeline_id = os.getenv('CI_PIPELINE_ID', '0')
+pipeline_iid = os.getenv('CI_PIPELINE_IID', '0')
 job_status = os.getenv('CI_JOB_STATUS', 'failed')
 job_stage = os.getenv('CI_JOB_STAGE', 'test')
 api_url = os.getenv('CI_API_V4_URL')
 
-if sys.argv[1]: 
+if len(sys.argv) == 2: 
   print(sys.argv[1])
   id = sys.argv[1].split("=")
-  if id[1]:
+  if len(id) == 2 and id[0] == "chat_id" and id[1] != "":
     chat_id = id[1]
 
 
@@ -50,10 +51,16 @@ def get_previous_commit():
   url = f'{api_url}/projects/{project_id}/pipelines?ref={branch}&scope=finished'
   response = requests.get(url, headers={'PRIVATE-TOKEN': private_token })
   response_json = response.json()
-  return response_json[0]['sha']
+  if len(response_json) > 0:
+    return response_json[0]['sha']
+
+  return ''
 
 def get_commits():
   previous_commit_sha = get_previous_commit()
+  if previous_commit_sha == "":
+    return "No pipeline history"
+
   cmd = [
       'git',
       'log',
@@ -86,7 +93,7 @@ def build_message():
   %23{job_status} %23{project_group}_{project_name}
 
   <b>{project_group} / {project_name}</b>
-  Build: <a href="{project_url}/-/pipelines/{pipeline_id}">{pipeline_id}</a>
+  Build: <a href="{project_url}/-/pipelines/{pipeline_id}">{pipeline_iid}</a>
   Branch: <b>{branch}</b>
 
   <i>Commits:</i>
