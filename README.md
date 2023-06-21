@@ -11,7 +11,7 @@ In addition to base docker image inside this container will be installed:
 ### Publishing updates
 
 ```sh
-./scripts/docker_publish.sh publish gitlab-base 
+./scripts/docker_publish.sh gitlab-base 
 ```
 
 ## `docker/gitlab-appcenter` - Docker container with Appcenter CLI
@@ -21,15 +21,15 @@ For code-push deployment in gitlab pipeline
 ### Publishing updates
 
 ```sh
-./scripts/docker_publish.sh publish gitlab-appcenter 
+./scripts/docker_publish.sh gitlab-appcenter 
 ```
 
-## `docker/gitlab-fastlane` - Docker container with Fatslane & plugins
+## `docker/gitlab-fastlane-android` - Docker container with Fatslane & plugins
 
 For Android deployment to Firebase App Distribution and Google Play
 
 ### Publishing updates
 
 ```sh
-./scripts/docker_publish.sh publish gitlab-fastlane 
+./scripts/docker_publish.sh gitlab-fastlane-android
 ```
