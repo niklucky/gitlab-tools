@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-REMOTE_NAME=${PROJECT_NAME}_${CI_PIPELINE_IID}
+DOCKER_CONTEXT_NAME=${PROJECT_NAME}_${CI_PIPELINE_IID}
 #
 ## Login to gitlab docker registry
 #
@@ -59,28 +59,29 @@ function clean() {
 
 
 function createSSHContext() {
-  docker context create ${REMOTE_NAME} --docker "host=ssh://${REMOTE_SSH_HOST}";
-  docker context use ${REMOTE_NAME};
+  echo "Create SSH context: ${DOCKER_CONTEXT_NAME} (${REMOTE_SSH_HOST})";
+  docker context create ${DOCKER_CONTEXT_NAME} --docker "host=ssh://${REMOTE_SSH_HOST}";
+  docker context use ${DOCKER_CONTEXT_NAME};
 }
 
 function createTCPContext() {
-  echo "Create TCP context: ${DOCKER_SWARM_HOST}";
+  echo "Create TCP context: ${DOCKER_CONTEXT_NAME} (${DOCKER_SWARM_HOST})";
 
-  docker context create ${REMOTE_NAME} --description "Remote swarm" \
+  docker context create ${DOCKER_CONTEXT_NAME} --description "Remote swarm" \
     --docker "host=${DOCKER_SWARM_HOST},ca=${DOCKER_SWARM_CACERT},cert=${DOCKER_SWARM_CERT},key=${DOCKER_SWARM_KEY}";
 
-  docker context use ${REMOTE_NAME};
+  docker context use ${DOCKER_CONTEXT_NAME};
 }
-function removeTCPContext() {
-  echo "Remove TCP context: ${DOCKER_SWARM_HOST}";
+function removeContext() {
+  echo "Remove context: ${DOCKER_CONTEXT_NAME}";
 
   docker context use default;
-  docker context rm ${REMOTE_NAME};
+  docker context rm ${DOCKER_CONTEXT_NAME};
 }
 
 function createNetwork() {
   docker \
-    --context ${REMOTE_NAME} \
+    --context ${DOCKER_CONTEXT_NAME} \
     network \
     create \
     ${CI_PROJECT_NAMESPACE} \
@@ -90,7 +91,7 @@ function createNetwork() {
     || true;
 
   docker \
-    --context ${REMOTE_NAME} \
+    --context ${DOCKER_CONTEXT_NAME} \
     network \
     create \
     ${CI_PROJECT_NAMESPACE}_ext \
@@ -115,7 +116,7 @@ function stackDeploy() {
   /usr/bin/docker-compose --file compose.yml pull
 
   docker \
-    --context ${REMOTE_NAME} \
+    --context ${DOCKER_CONTEXT_NAME} \
     stack \
     deploy \
     --prune \

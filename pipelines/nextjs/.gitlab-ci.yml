@@ -1,0 +1,81 @@
+stages: # List of stages for jobs, and their order of execution
+  - build
+  - test
+  - deploy
+
+variables:
+  DOCKER_IMAGE: "${CI_REGISTRY_IMAGE}/${CI_COMMIT_BRANCH}"
+  PROJECT_NAME: "${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}"
+
+build-job:
+  image: niklucky/gitlab-docker:latest
+  stage: build
+  tags:
+    - docker
+  environment: $CI_COMMIT_BRANCH
+  rules:
+    - if: ($CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "main")
+      when: always
+  script:
+    - "docker_tools.sh build"
+    - "docker_tools.sh push"
+  after_script:
+    - "notify_telegram.py"
+    - "docker_tools.sh clean"
+
+test-job:
+  image: niklucky/gitlab-docker:latest
+  stage: test
+  tags:
+    - docker
+  environment: "test"
+  variables:
+    # Re-defining Docker variables for Test Stand
+    DOCKER_SWARM_HOST: "${TS01_DOCKER_SWARM_HOST}"
+    DOCKER_SWARM_CACERT: "${TS01_DOCKER_SWARM_CACERT}"
+    DOCKER_SWARM_CERT: "${TS01_DOCKER_SWARM_CERT}"
+    DOCKER_SWARM_KEY: "${TS01_DOCKER_SWARM_KEY}"
+  rules:
+    - if: ($CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "main")
+  before_script:
+    - "docker_tools.sh createTCPContext"
+    - "docker stack rm ${PROJECT_NAME}"
+  script:
+    - "docker_tools.sh renderDockerCompose"
+    - "docker_tools.sh createTCPContext"
+    - "docker_tools.sh createNetwork"
+    - "docker_tools.sh stackDeploy"
+    - "docker build -t tests/${PROJECT_NAME} -f infrastructure/test/Dockerfile ."
+    - "docker run -e TARGET_HOST=http://172.17.0.1:4901 tests/${PROJECT_NAME}"
+  after_script:
+    - notify_telegram.py
+    - "docker image rm tests/${PROJECT_NAME} -f"
+    - "docker_tools.sh createTCPContext"
+    - "docker stack rm ${PROJECT_NAME}"
+    - "docker_tools.sh removeContext"
+
+deploy-job:
+  stage: deploy
+  image: niklucky/gitlab-docker:latest
+  tags:
+    - docker
+  rules:
+    - if: $CI_COMMIT_BRANCH == "develop"
+      when: always
+      # when: never
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
+  environment: $CI_COMMIT_BRANCH
+  script:
+    - "./infrastructure/deploy/ssh-tunnel.sh"
+    - "cat ~/.ssh/id_rsa"
+    - "cat ~/.ssh/config"
+    - "docker_tools.sh renderDockerCompose"
+    # - "docker_tools.sh createTCPContext"
+    - "docker_tools.sh createSSHContext"
+    - "docker_tools.sh createNetwork"
+    - "docker_tools.sh stackDeploy"
+  after_script:
+    - "docker_tools.sh removeContext"
+    - "notify_telegram.py"
+    # - "notify_telegram.py chat_id=${TELEGRAM_CHAT_ID_MOSSPORT}"
