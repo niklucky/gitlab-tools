@@ -5,8 +5,8 @@ variables:
   tags:
     - docker
   before_script:
+    # Gitlab secret files loader
     - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
-    - "cat $ZAVIDOVO_RELEASE_SECRETS >> ./android/secrets.properties"
     - printenv
     - "cp $ENV ./env.js"
     - yarn install --frozen-lockfile --cache-folder .yarn

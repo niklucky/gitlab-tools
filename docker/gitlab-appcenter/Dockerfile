@@ -14,5 +14,3 @@ RUN apk update && \
 RUN pip install requests;
 
 COPY ./lib/notify_telegram_codepush.js /usr/local/bin/notify_telegram_codepush.js
-
-RUN python --version
