@@ -1,32 +1,30 @@
 #!/usr/bin/env sh
 
-function publish() {
-  IMAGE=$1
-  echo $IMAGE
-  FILE=docker/$IMAGE/version.txt
-  echo $FILE
-  v=0
 
-  if [ -f "$FILE" ]; then
-    v=$(cat $FILE)
-  fi
+IMAGE=$1
+echo $IMAGE
+FILE=docker/$IMAGE/version.txt
+echo $FILE
+v=0
 
-  echo $v
-  VERSION=$((v + 1))
+if [ -f "$FILE" ]; then
+  v=$(cat $FILE)
+fi
 
-  # docker buildx build \
-  #   --platform linux/amd64 \
-  #   --tag "niklucky/gitlab-base:${VERSION}" \
-  #   --tag "niklucky/gitlab-base:latest" \
-  #   .
+echo $v
+VERSION=$((v + 1))
 
-  # docker push niklucky/gitlab-base:$VERSION
-  # docker push niklucky/gitlab-base:latest
+docker buildx build \
+  --platform linux/amd64 \
+  --tag "niklucky/$IMAGE:${VERSION}" \
+  --tag "niklucky/$IMAGE:latest" \
+  --file docker/$IMAGE/Dockerfile \
+  .
 
-  echo $VERSION > $FILE
+docker push niklucky/$IMAGE:$VERSION
+docker push niklucky/$IMAGE:latest
 
-  # git add $FILE
-  # git commit -m "Version $VERSION for $IMAGE"
-}
+echo $VERSION > $FILE
 
-"$@"
+# git add $FILE
+# git commit -m "Version $VERSION for $IMAGE"
