@@ -26,5 +26,5 @@ docker push niklucky/$IMAGE:latest
 
 echo $VERSION > $FILE
 
-# git add $FILE
-# git commit -m "Version $VERSION for $IMAGE"
+git add $FILE
+git commit -m "Version $VERSION for $IMAGE"
