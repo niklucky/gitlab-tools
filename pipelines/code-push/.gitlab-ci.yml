@@ -13,7 +13,7 @@
   after_script:
     - appcenter logout
 
-code-push-ios:
+.code-push-ios:
   extends: .code-push
   script:
     - "yarn ci:codepush:ios:${CI_COMMIT_BRANCH}"
@@ -21,7 +21,7 @@ code-push-ios:
     - "notify_telegram_codepush.js ios"
     - "notify_telegram_codepush.js ios chat_id=${TELEGRAM_CHAT_ID_ADDITIONAL}"
 
-code-push-android:
+.code-push-android:
   extends: .code-push
   script:
     - "yarn ci:codepush:android:${CI_COMMIT_BRANCH}"
