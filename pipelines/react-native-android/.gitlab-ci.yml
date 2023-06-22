@@ -33,6 +33,7 @@ android-publish-firebase:
     - when: never
   script:
     # - bundle update
+    - "cp ./Fastfile fastlane/Fastfile"
     - "fastlane android publish_firebase_app"
     - "fastlane android check_firebase"
   artifacts:

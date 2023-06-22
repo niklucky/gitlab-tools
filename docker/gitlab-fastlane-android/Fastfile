@@ -1,0 +1,66 @@
+fastlane_version '2.213.0'
+
+platform :ios do
+   # iOS Lanes
+end
+
+platform :android do
+  # Android Lanes
+  desc 'Build Android Staging.'
+  lane :buildStaging do
+    # gradle(task: 'clean', project_dir: 'android/')
+    # gradle(task: 'assemble', build_type: 'Release', project_dir: 'android/')
+    gradle(task: 'bundle', build_type: 'ReleaseStaging', project_dir: 'android/')
+  end
+
+  desc 'Build Android Release.'
+  lane :buildRelease do
+    gradle(task: 'clean', project_dir: 'android/')
+    # gradle(task: 'assemble', build_type: 'Release', project_dir: 'android/')
+    gradle(task: 'bundle', build_type: 'Release', project_dir: 'android/')
+  end
+
+  desc 'Google Play: Publish to internal.'
+  lane :internal do
+    buildRelease
+    supply(
+      track: 'internal',
+      track_promote_to: 'internal',
+    )
+  end
+
+  desc 'Google Play: promote to Beta.'
+  lane :promote_beta do
+    supply(
+      track: 'internal',
+      track_promote_to: 'beta',
+    )
+  end
+
+  desc 'Google Play: promote Beta to Production.'
+  lane :promote_production do
+    supply(
+      track: 'beta',
+      track_promote_to: 'production',
+    )
+  end
+
+  desc 'Publish to Firebase app distribution.'
+  lane :publish_firebase_app do
+    buildStaging
+    firebase_app_distribution(
+      app: ENV['FIREBASE_APP_ID'],
+      groups: "qa-testers",
+      android_artifact_type: 'AAB',
+      firebase_cli_token: ENV['FIREBASE_CLI_TOKEN']
+    )
+  end
+
+  desc 'Firebase: get latest release.'
+  lane :check_firebase do
+    firebase_app_distribution_get_latest_release(
+      app: ENV['FIREBASE_APP_ID'],
+      firebase_cli_token: ENV['FIREBASE_CLI_TOKEN']
+    )
+  end
+end
