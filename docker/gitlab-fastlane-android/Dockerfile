@@ -14,7 +14,9 @@ RUN gem install rake && \
   gem install bundler
 
 COPY ./docker/gitlab-fastlane-android/Gemfile ./Gemfile
+
 RUN bundle update
 
+COPY ./docker/gitlab-fastlane-android/Gemfile /tmp/Gemfile
 COPY ./docker/gitlab-fastlane-android/Fastfile /tmp/Fastfile
 COPY ./lib/notify_telegram.py /usr/local/bin/notify_telegram.py
