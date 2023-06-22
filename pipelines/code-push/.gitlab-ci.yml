@@ -10,21 +10,23 @@
     - "cp $ENV ./env.js"
     - yarn install --frozen-lockfile
     - appcenter login --token $APPCENTER_ACCESS_TOKEN_FULL
+  script:
+    - "yarn ci:codepush:${PLATFORM}:${CI_ENVIRONMENT_NAME}"
+    - "appcenter codepush deployment list --app $APPCENTER_APP --disable-telemetry --output json >> ${PLATFORM}_version.json"
+
+    - "notify_telegram_codepush.js ${PLATFORM}"
+    - "notify_telegram_codepush.js ${PLATFORM} chat_id=${TELEGRAM_CHAT_ID_ADDITIONAL}"
   after_script:
     - appcenter logout
 
 .code-push-ios:
   extends: .code-push
-  script:
-    - "yarn ci:codepush:ios:${CI_ENVIRONMENT_NAME}"
-    - "appcenter codepush deployment list --app $APPCENTER_IOS_APP --disable-telemetry --output json >> ios_version.json"
-    - "notify_telegram_codepush.js ios"
-    - "notify_telegram_codepush.js ios chat_id=${TELEGRAM_CHAT_ID_ADDITIONAL}"
+  variables:
+    PLATFORM: ios
+    APPCENTER_APP: $APPCENTER_IOS_APP
 
 .code-push-android:
   extends: .code-push
-  script:
-    - "yarn ci:codepush:android:${CI_ENVIRONMENT_NAME}"
-    - "appcenter codepush deployment list --app $APPCENTER_ANDROID_APP --disable-telemetry --output json >> android_version.json"
-    - "notify_telegram_codepush.js android"
-    - "notify_telegram_codepush.js android chat_id=${TELEGRAM_CHAT_ID_ADDITIONAL}"
+  variables:
+    PLATFORM: android
+    APPCENTER_APP: $APPCENTER_ANDROID_APP
