@@ -12,7 +12,7 @@ variables:
     - printenv
     - "cp $ENV ./env.js"
     - "cp /tmp/Fastfile fastlane/Fastfile"
-    - "cp /tmp/Gemfile Gemfile"
+    - bundle update
     - yarn install --frozen-lockfile --cache-folder .yarn
     - export VERSION_NAME=$(npm pkg get version | tr -d \")
     - export VERSION_CODE=$CI_PIPELINE_IID
