@@ -6,6 +6,8 @@ variables:
     - docker
   before_script:
     # Gitlab secret files loader
+    - export LC_ALL=en_US.UTF-8
+    - export LANG=en_US.UTF-8
     - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
     - printenv
     - "cp $ENV ./env.js"

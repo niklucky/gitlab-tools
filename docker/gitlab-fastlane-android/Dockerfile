@@ -16,8 +16,5 @@ RUN gem install rake && \
 COPY ./docker/gitlab-fastlane-android/Gemfile ./Gemfile
 RUN bundle update
 
-RUN export LC_ALL=en_US.UTF-8
-RUN export LANG=en_US.UTF-8
-
 COPY ./docker/gitlab-fastlane-android/Fastfile /tmp/Fastfile
 COPY ./lib/notify_telegram.py /usr/local/bin/notify_telegram.py
