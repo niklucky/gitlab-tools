@@ -19,7 +19,7 @@ variables:
 .android-publish-firebase:
   extends: .android-build
   stage: android
-  image: niklucky/gitlab-fastlane-android-android:latest
+  image: niklucky/gitlab-fastlane-android:latest
   cache:
     key:
       files:
@@ -42,7 +42,7 @@ variables:
 android-publish-playstore:
   extends: .android-build
   stage: android
-  image: niklucky/gitlab-fastlane-android-android-android:latest
+  image: niklucky/gitlab-fastlane-android:latest
   cache:
     key:
       files:
@@ -65,7 +65,7 @@ android-promote-beta:
   stage: promote
   tags:
     - docker
-  image: niklucky/gitlab-fastlane-android-android:latest
+  image: niklucky/gitlab-fastlane-android:latest
   environment: main
   rules:
     - if: ($CI_COMMIT_TAG =~ /^android-release-\d+.\d+.\d+-?.*$/)
