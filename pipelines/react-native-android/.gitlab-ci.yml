@@ -9,7 +9,7 @@ variables:
     - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
     - printenv
     - "cp $ENV ./env.js"
-    - "cp ./Fastfile fastlane/Fastfile"
+    - "cp /tmp/Fastfile fastlane/Fastfile"
     - yarn install --frozen-lockfile --cache-folder .yarn
     - export VERSION_NAME=$(npm pkg get version | tr -d \")
     - export VERSION_CODE=$CI_PIPELINE_IID
