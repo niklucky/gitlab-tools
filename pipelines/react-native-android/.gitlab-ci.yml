@@ -16,7 +16,7 @@ variables:
     - echo $VERSION_NAME
     - echo $VERSION_CODE
 
-android-publish-firebase:
+.android-publish-firebase:
   extends: .android-build
   stage: android
   image: niklucky/gitlab-fastlane-android-android:latest
