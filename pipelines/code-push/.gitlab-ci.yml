@@ -15,7 +15,7 @@
     - echo $VERSION_CODE
     - appcenter login --token $APPCENTER_ACCESS_TOKEN_FULL
   script:
-    - "yarn ci:codepush:${PLATFORM}:${CI_ENVIRONMENT_NAME}"
+    - "yarn ci:codepush:${PLATFORM}:${CI_ENVIRONMENT_NAME} -t $VERSION_NAME"
     - "appcenter codepush deployment list --app $APPCENTER_APP --disable-telemetry --output json >> ${PLATFORM}_version.json"
 
     - "notify_telegram_codepush.js ${PLATFORM}"
