@@ -18,6 +18,7 @@ variables:
     - export VERSION_CODE=$CI_PIPELINE_IID
     - echo $VERSION_NAME
     - echo $VERSION_CODE
+    - cat android/app/secret.properties
 
 .android-publish-firebase:
   extends: .android-build
