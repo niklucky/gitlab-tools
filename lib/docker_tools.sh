@@ -1,6 +1,13 @@
 #!/usr/bin/env sh
 
 DOCKER_CONTEXT_NAME=${PROJECT_NAME}_${CI_PIPELINE_IID}
+DIR="./"
+if [ "$PROJECT_DIR" ]; then
+  DIR="${PROJECT_DIR}/"
+fi
+
+echo "Working directory: ${DIR}"
+
 #
 ## Login to gitlab docker registry
 #
@@ -26,11 +33,11 @@ function build() {
     --build-arg "CHANNEL=$CI_ENVIRONMENT_NAME" \
     --build-arg "CI_COMMIT_BRANCH=$CI_COMMIT_BRANCH" \
     --build-arg "CI_COMMIT_SHA=$CI_COMMIT_SHA" \
-    --file "./infrastructure/build/Dockerfile" \
+    --file "${DIR}infrastructure/build/Dockerfile" \
     --cache-from "${DOCKER_IMAGE}:latest" \
     --tag "${DOCKER_IMAGE}:${CI_PIPELINE_IID}" \
     --tag "${DOCKER_IMAGE}:latest" \
-    ./
+    "${DIR}"
 }
 
 #
@@ -102,8 +109,8 @@ function createNetwork() {
 
 function renderDockerCompose() {
   /usr/bin/docker-compose \
-    -f ./infrastructure/deploy/docker-compose.yml \
-    -f ./infrastructure/deploy/${CI_ENVIRONMENT_NAME}.docker-compose.yml \
+    -f "${DIR}infrastructure/deploy/docker-compose.yml" \
+    -f "${DIR}infrastructure/deploy/${CI_ENVIRONMENT_NAME}.docker-compose.yml" \
     -p $PROJECT_NAME \
     config \
     | sed -E "s/cpus: ([0-9\\.]+)/cpus: '\\1'/" \

@@ -1,4 +1,4 @@
-stages: # List of stages for jobs, and their order of execution
+stages:
   - build
   - test
   - deploy
@@ -7,8 +7,8 @@ variables:
   DOCKER_IMAGE: "${CI_REGISTRY_IMAGE}/${CI_COMMIT_BRANCH}"
   PROJECT_NAME: "${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}"
 
-build-job:
-  image: niklucky/gitlab-docker:latest
+.build-push-docker:
+  image: niklucky/gitlab-base:latest
   stage: build
   tags:
     - docker
@@ -23,8 +23,8 @@ build-job:
     - "notify_telegram.py"
     - "docker_tools.sh clean"
 
-test-job:
-  image: niklucky/gitlab-docker:latest
+.test-api:
+  image: niklucky/gitlab-base:latest
   stage: test
   tags:
     - docker
@@ -42,7 +42,6 @@ test-job:
     - "docker stack rm ${PROJECT_NAME}"
   script:
     - "docker_tools.sh renderDockerCompose"
-    - "docker_tools.sh createTCPContext"
     - "docker_tools.sh createNetwork"
     - "docker_tools.sh stackDeploy"
     - "docker build -t tests/${PROJECT_NAME} -f infrastructure/test/Dockerfile ."
@@ -54,9 +53,9 @@ test-job:
     - "docker stack rm ${PROJECT_NAME}"
     - "docker_tools.sh removeContext"
 
-deploy-job:
+.deploy-docker-swarm:
   stage: deploy
-  image: niklucky/gitlab-docker:latest
+  image: niklucky/gitlab-base:latest
   tags:
     - docker
   rules:
@@ -67,15 +66,11 @@ deploy-job:
       when: manual
   environment: $CI_COMMIT_BRANCH
   script:
-    - "./infrastructure/deploy/ssh-tunnel.sh"
-    - "cat ~/.ssh/id_rsa"
-    - "cat ~/.ssh/config"
     - "docker_tools.sh renderDockerCompose"
-    # - "docker_tools.sh createTCPContext"
-    - "docker_tools.sh createSSHContext"
+    - "docker_tools.sh createTCPContext"
     - "docker_tools.sh createNetwork"
     - "docker_tools.sh stackDeploy"
   after_script:
     - "docker_tools.sh removeContext"
     - "notify_telegram.py"
-    # - "notify_telegram.py chat_id=${TELEGRAM_CHAT_ID_MOSSPORT}"
+    - "notify_telegram.py chat_id=${TELEGRAM_CHAT_ID_ADDITIONAL}"
