@@ -37,6 +37,7 @@ variables:
     DOCKER_SWARM_KEY: "${TS01_DOCKER_SWARM_KEY}"
   rules:
     - if: ($CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "main")
+    - when: on_success
   before_script:
     - "docker_tools.sh createTCPContext"
     - "docker stack rm ${PROJECT_NAME}"
@@ -64,6 +65,7 @@ variables:
       # when: never
     - if: $CI_COMMIT_BRANCH == "main"
       when: manual
+    - when: on_success
   environment: $CI_COMMIT_BRANCH
   script:
     - "docker_tools.sh renderDockerCompose"
