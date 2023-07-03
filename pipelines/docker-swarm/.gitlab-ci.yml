@@ -61,11 +61,9 @@ variables:
     - docker
   rules:
     - if: $CI_COMMIT_BRANCH == "develop"
-      when: always
-      # when: never
+      when: on_success
     - if: $CI_COMMIT_BRANCH == "main"
       when: manual
-    - when: on_success
   environment: $CI_COMMIT_BRANCH
   script:
     - "docker_tools.sh renderDockerCompose"
