@@ -19,9 +19,9 @@ RUN apk update \
     py3-pip \
     python3 \
     python3-dev \
-    git
+    git;
 
-RUN pip install requests docker-compose;
+RUN pip install requests;
 
 # List of useful scripts
 COPY ./lib/notify_telegram.py /usr/local/bin/notify_telegram.py

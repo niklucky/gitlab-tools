@@ -2,8 +2,14 @@
 
 DOCKER_CONTEXT_NAME=${PROJECT_NAME}_${CI_PIPELINE_IID}
 DIR="./"
+CONTEXT_DIR="."
+
 if [ "$PROJECT_DIR" ]; then
   DIR="${PROJECT_DIR}/"
+fi
+
+if [ "$DOCKER_CONTEXT_DIR" ]; then
+  CONTEXT_DIR="${DOCKER_CONTEXT_DIR}/"
 fi
 
 echo "Working directory: ${DIR}"
@@ -37,7 +43,7 @@ function build() {
     --cache-from "${DOCKER_IMAGE}:latest" \
     --tag "${DOCKER_IMAGE}:${CI_PIPELINE_IID}" \
     --tag "${DOCKER_IMAGE}:latest" \
-    "${DIR}"
+    "${CONTEXT_DIR}"
 }
 
 #
@@ -107,20 +113,15 @@ function createNetwork() {
     || true;
 }
 
-function renderDockerCompose() {
-  /usr/bin/docker-compose \
-    -f "${DIR}infrastructure/deploy/docker-compose.yml" \
-    -f "${DIR}infrastructure/deploy/${CI_ENVIRONMENT_NAME}.docker-compose.yml" \
-    -p $PROJECT_NAME \
-    config \
-    | sed -E "s/cpus: ([0-9\\.]+)/cpus: '\\1'/" \
-          > "./compose.yml";
+function copyDockerCompose() {
+  cp "${DIR}infrastructure/deploy/docker-compose.yml" \
+     "./compose.yml";
   }
 
 function stackDeploy() {
   login;
 
-  /usr/bin/docker-compose --file compose.yml pull
+  docker compose --file compose.yml pull
 
   docker \
     --context ${DOCKER_CONTEXT_NAME} \

@@ -43,7 +43,7 @@ variables:
     - "docker_tools.sh createTCPContext"
     - "docker stack rm ${PROJECT_NAME}"
   script:
-    - "docker_tools.sh renderDockerCompose"
+    - "docker_tools.sh copyDockerCompose"
     - "docker_tools.sh createNetwork"
     - "docker_tools.sh stackDeploy"
     - "docker build -t tests/${PROJECT_NAME} -f infrastructure/test/Dockerfile ."
@@ -67,7 +67,7 @@ variables:
       when: manual
   environment: $CI_COMMIT_BRANCH
   script:
-    - "docker_tools.sh renderDockerCompose"
+    - "docker_tools.sh copyDockerCompose"
     - "docker_tools.sh createTCPContext"
     - "docker_tools.sh createNetwork"
     - "docker_tools.sh stackDeploy"
