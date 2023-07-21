@@ -1,8 +1,13 @@
 #!/usr/bin/env sh
 
+pn=${PROJECT_NAME}
+PROJECT_NAME=${pn//\//_}
+
 DOCKER_CONTEXT_NAME=${PROJECT_NAME}_${CI_PIPELINE_IID}
+
 DIR="./"
 CONTEXT_DIR="."
+NETWORK="${CI_PROJECT_NAMESPACE}"
 
 if [ "$PROJECT_DIR" ]; then
   DIR="${PROJECT_DIR}/"
@@ -10,6 +15,10 @@ fi
 
 if [ "$DOCKER_CONTEXT_DIR" ]; then
   CONTEXT_DIR="${DOCKER_CONTEXT_DIR}/"
+fi
+
+if [ "$DOCKER_NETWORK" ]; then
+  NETWORK="${DOCKER_NETWORK}"
 fi
 
 echo "Working directory: ${DIR}"
@@ -71,21 +80,39 @@ function clean() {
 }
 
 function createRemoteContext() {
-  if [ "$REMOTE_SSH_HOST" ];
-  then
-    createSSHContext();
+  echo "Creating context: ${REMOTE_SSH_HOST}"
+  if [ "$REMOTE_SSH_HOST" ]; then
+    createSSHContext
   else
-    createTCPContext();
+    createTCPContext
   fi
-
 }
 function createSSHContext() {
   echo "Setting up SSH-keys";
+  mkdir -p ~/.ssh;
+  chmod 700 ~/.ssh;
+
   eval $(ssh-agent -s);
-  chmod 400 "$SSH_PRIVATE_KEY";
-  ssh-add "$SSH_PRIVATE_KEY";
-  mkdir -p ~/.ssh
-  chmod 700 ~/.ssh
+
+  cat $SSH_PRIVATE_KEY > ~/.ssh/id_rsa;
+  chmod 400 ~/.ssh/id_rsa;
+  ssh-add ~/.ssh/id_rsa;
+
+echo "
+Host *
+  IdentitiesOnly yes
+  PreferredAuthentications publickey
+  ForwardAgent yes
+  StrictHostKeyChecking no
+  IdentityFile ~/.ssh/id_rsa
+  UserKnownHostsFile /dev/null
+" > ~/.ssh/config;
+
+  chmod 600 ~/.ssh/config;
+
+
+  echo "SSH config:"
+  cat ~/.ssh/config
 
   echo "Create SSH context: ${DOCKER_CONTEXT_NAME} (${REMOTE_SSH_HOST})";
   docker context create ${DOCKER_CONTEXT_NAME} --docker "host=ssh://${REMOTE_SSH_HOST}";
@@ -108,11 +135,13 @@ function removeContext() {
 }
 
 function createNetwork() {
+  echo "Creating network: ${NETWORK}"
+
   docker \
     --context ${DOCKER_CONTEXT_NAME} \
     network \
     create \
-    ${CI_PROJECT_NAMESPACE} \
+    ${NETWORK} \
     --driver overlay \
     --attachable \
     --internal \
