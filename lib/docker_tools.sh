@@ -70,8 +70,23 @@ function clean() {
     "${DOCKER_IMAGE}:${CI_PIPELINE_IID}" || true;  
 }
 
+function createRemoteContext() {
+  if [ "$REMOTE_SSH_HOST" ];
+  then
+    createSSHContext();
+  else
+    createTCPContext();
+  fi
 
+}
 function createSSHContext() {
+  echo "Setting up SSH-keys";
+  eval $(ssh-agent -s);
+  chmod 400 "$SSH_PRIVATE_KEY";
+  ssh-add "$SSH_PRIVATE_KEY";
+  mkdir -p ~/.ssh
+  chmod 700 ~/.ssh
+
   echo "Create SSH context: ${DOCKER_CONTEXT_NAME} (${REMOTE_SSH_HOST})";
   docker context create ${DOCKER_CONTEXT_NAME} --docker "host=ssh://${REMOTE_SSH_HOST}";
   docker context use ${DOCKER_CONTEXT_NAME};
@@ -101,15 +116,6 @@ function createNetwork() {
     --driver overlay \
     --attachable \
     --internal \
-    || true;
-
-  docker \
-    --context ${DOCKER_CONTEXT_NAME} \
-    network \
-    create \
-    ${CI_PROJECT_NAMESPACE}_ext \
-    --driver overlay \
-    --attachable \
     || true;
 }
 

@@ -68,7 +68,7 @@ variables:
   environment: $CI_COMMIT_BRANCH
   script:
     - "docker_tools.sh copyDockerCompose"
-    - "docker_tools.sh createTCPContext"
+    - "docker_tools.sh createRemoteContext"
     - "docker_tools.sh createNetwork"
     - "docker_tools.sh stackDeploy"
   after_script:
