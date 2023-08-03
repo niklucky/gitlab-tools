@@ -14,7 +14,7 @@ variables:
     - "cp /tmp/Fastfile fastlane/Fastfile"
     - bundle update
     - yarn install --frozen-lockfile --cache-folder .yarn
-    - export VERSION_NAME=$(npm pkg get version | tr -d \")
+    - export VERSION_NAME=$(npm pkg get version | head -1 | tr -d \")
     - export VERSION_CODE=$CI_PIPELINE_IID
     - echo $VERSION_NAME
     - echo $VERSION_CODE
