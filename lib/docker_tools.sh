@@ -1,6 +1,10 @@
 #!/usr/bin/env sh
 
 pn=${PROJECT_NAME}
+if [ "$DOCKER_STACK_NAME" ]; then
+  pn="${DOCKER_STACK_NAME}"
+fi
+
 PROJECT_NAME=${pn//\//_}
 
 DOCKER_CONTEXT_NAME=${PROJECT_NAME}_${CI_PIPELINE_IID}

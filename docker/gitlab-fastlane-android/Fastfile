@@ -6,14 +6,25 @@ end
 
 platform :android do
   # Android Lanes
-  desc 'Build Android Staging.'
-  lane :buildStaging do
+  desc 'Build Android Staging APK.'
+  lane :assembleReleaseStaging do
     # gradle(task: 'clean', project_dir: 'android/')
-    # gradle(task: 'assemble', build_type: 'Release', project_dir: 'android/')
+    gradle(task: 'assemble', build_type: 'ReleaseStaging', project_dir: 'android/')
+  end
+
+  desc 'Build Android Staging AAB.'
+  lane :buildReleaseStaging do
+    # gradle(task: 'clean', project_dir: 'android/')
     gradle(task: 'bundle', build_type: 'ReleaseStaging', project_dir: 'android/')
   end
 
-  desc 'Build Android Release.'
+  desc 'Build Android Release APK.'
+  lane :assembleRelease do
+    gradle(task: 'clean', project_dir: 'android/')
+    gradle(task: 'assemble', build_type: 'Release', project_dir: 'android/')
+  end
+
+  desc 'Build Android Release AAB.'
   lane :buildRelease do
     gradle(task: 'clean', project_dir: 'android/')
     # gradle(task: 'assemble', build_type: 'Release', project_dir: 'android/')
