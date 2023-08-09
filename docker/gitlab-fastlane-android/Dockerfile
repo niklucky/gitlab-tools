@@ -7,7 +7,8 @@ RUN apt-get install --no-install-recommends -y --allow-unauthenticated \
     ruby-full \
     curl \
     python3 \
-    python3-dev
+    python3-dev \
+    python3-pip
 
 RUN gem install rake && \
   gem install fastlane && \
