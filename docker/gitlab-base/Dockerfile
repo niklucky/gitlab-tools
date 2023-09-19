@@ -23,6 +23,9 @@ RUN apk update \
 
 RUN pip install requests;
 
+# Installing gitlab secure file downloader
+RUN curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | sh
+
 # List of useful scripts
 COPY ./lib/notify_telegram.py /usr/local/bin/notify_telegram.py
 COPY ./lib/docker_tools.sh /usr/local/bin/docker_tools.sh
