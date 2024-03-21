@@ -11,6 +11,6 @@ RUN apk update && \
     python3-dev \
     git
 
-RUN pip install requests;
+RUN pip3 install requests  --break-system-packages;
 
 COPY ./lib/notify_telegram_codepush.js /usr/local/bin/notify_telegram_codepush.js
