@@ -16,7 +16,7 @@
     - code-push-standalone login --accessKey $CODEPUSH_ACCESS_KEY $CODEPUSH_SERVER_URL
   script:
     - "yarn ci:codepush:${PLATFORM}:${CI_ENVIRONMENT_NAME} -t $VERSION_NAME"
-    - "code-push-standalone deployment list --app $APPCENTER_APP --disable-telemetry --output json >> ${PLATFORM}_version.json"
+    - "code-push-standalone deployment list $APPCENTER_APP --disable-telemetry --format json >> ${PLATFORM}_version.json"
 
     - "notify_telegram_codepush.js ${PLATFORM}"
     - "notify_telegram_codepush.js ${PLATFORM} chat_id=${TELEGRAM_CHAT_ID_ADDITIONAL}"
